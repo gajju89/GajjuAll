@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">ZasoDataPush</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="button_send">SEND</string>
+    <string name="add_photo">AddPhoto</string>
+    <string name="map_button">GetLocation</string>
+</resources>
