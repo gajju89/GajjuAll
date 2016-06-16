@@ -35,8 +35,8 @@ public class AgentPicServiceImpl  {
 	@Autowired
 	AgentPicRepository agentrepo;
 	
-	private static String bucketName = "Agentpics";
-	private static String keyName = "AKIAIUNT2LQ62B4HH4EA";
+	private static String bucketName = "";
+	private static String keyName = "";
 
 	/*private JdbcTemplate jdbcTemplate;
 
@@ -115,7 +115,7 @@ public class AgentPicServiceImpl  {
 
 	public String uploadToAws(File file) throws Exception {
 		
-		AWSCredentials credentials = new BasicAWSCredentials("AKIAIUNT2LQ62B4HH4EA", "QZXn2rh+JaJoItkHiRRHB9SvYoK/t/GM4N+nmi0V");
+		AWSCredentials credentials = new BasicAWSCredentials("", "");
         AmazonS3 s3client = new AmazonS3Client(credentials);
         AccessControlList acl = new AccessControlList();
         acl.grantPermission(GroupGrantee.AllUsers, Permission.Read);
