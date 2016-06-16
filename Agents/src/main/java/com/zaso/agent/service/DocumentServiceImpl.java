@@ -26,15 +26,16 @@ import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.GroupGrantee;
 import com.amazonaws.services.s3.model.Permission;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.zaso.agent.dao.DocumentStorageDaoImpl;
+
 import com.zaso.agent.model.DocumentStorage;
+import com.zaso.agent.repositories.DocumentStorageRepository;
 import com.zaso.agent.utils.GeneralUtil;
 
 @Repository
 public class DocumentServiceImpl implements DocumentService {
-	@Autowired
-	DocumentStorageDaoImpl dao;
 	
+	@Autowired
+	DocumentStorageRepository docRepo;
 	
 	private static String bucketName = "Agentpic";
 	private static String objectKey = "AKIAJ65RHJATU3BAIHCQ";
@@ -45,6 +46,8 @@ public class DocumentServiceImpl implements DocumentService {
 	{
 		super();
 	}
+	
+	@Autowired
 	public DocumentServiceImpl(DataSource dataSource)
 	{
 		jdbcTemplate=new JdbcTemplate(dataSource);
@@ -168,7 +171,7 @@ public void uploadToAws(File file) throws Exception {
 			model.setObjectKey(objectKey);
 			model.setUserId(uid);
 			//model.setDocNumber(docNum);
-			dao.saveDocument(model);
+			docRepo.save(model);
 			}
 			catch(Exception e)
 			{

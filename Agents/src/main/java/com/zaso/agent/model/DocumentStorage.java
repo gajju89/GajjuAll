@@ -2,9 +2,11 @@ package com.zaso.agent.model;
 
 import java.net.URL;
 
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@Document(collection="documentStorage")
 public class DocumentStorage {
 	private String docid;
 	private String docNumber;

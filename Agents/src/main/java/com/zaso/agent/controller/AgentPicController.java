@@ -3,6 +3,7 @@ package com.zaso.agent.controller;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.zaso.agent.model.AgentPic;
+import com.zaso.agent.model.PicUrl;
 import com.zaso.agent.service.AgentPicServiceImpl;
 
 @Controller
@@ -46,10 +48,17 @@ public class AgentPicController {
 		 }
 	 }
 	 
-	 @RequestMapping(value="/upload", method=RequestMethod.POST,headers="Accept=multipart/form-data")
-	 public @ResponseBody void saveFile(@RequestParam("emailId")String emailId,@RequestParam("photoFile") MultipartFile photoFile)
+	 @RequestMapping(value="/upload/{fileType}", method=RequestMethod.POST,headers="Accept=multipart/form-data")
+	 public @ResponseBody void saveFile(@RequestParam("emailId")String emailId,@RequestParam("photoFile") MultipartFile photoFile,@PathVariable("fileType")String fileType)
 	 {
-		 String email=emailId;
-		 MultipartFile file=photoFile;
+		 /*String email=emailId;
+		 MultipartFile file=photoFile;*/
+		 ageimpl.saveOrUpdate(emailId, photoFile, fileType);
+	 }
+	 
+	 @RequestMapping(value="/get/picByEmail/{email}/",method=RequestMethod.GET)
+	 public @ResponseBody List<String> listPicByEmail(@PathVariable("email")String email)
+	 {
+		return  ageimpl.list(email);
 	 }
 }

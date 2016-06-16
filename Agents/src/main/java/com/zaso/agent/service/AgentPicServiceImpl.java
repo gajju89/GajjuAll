@@ -3,38 +3,42 @@ package com.zaso.agent.service;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.AccessControlList;
 import com.amazonaws.services.s3.model.GroupGrantee;
 import com.amazonaws.services.s3.model.Permission;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.zaso.agent.dao.AgentDao;
-import com.zaso.agent.dao.AgentPicDao;
+
 import com.zaso.agent.model.AgentPic;
+
+import com.zaso.agent.repositories.AgentPicRepository;
+
 import com.zaso.agent.utils.GeneralUtil;
 
 import redis.clients.jedis.Jedis;
 
 @Repository
-public class AgentPicServiceImpl implements AgentPicService {
+public class AgentPicServiceImpl  {
+	@Autowired
+	AgentPicRepository agentrepo;
 	
-	private static String bucketName = "Agentpic";
-	private static String keyName = "AKIAJ65RHJATU3BAIHCQ";
+	private static String bucketName = "Agentpics";
+	private static String keyName = "AKIAIUNT2LQ62B4HH4EA";
 
-	private JdbcTemplate jdbcTemplate;
+	/*private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	AgentPicDao age;
@@ -46,23 +50,30 @@ public class AgentPicServiceImpl implements AgentPicService {
 
 	public AgentPicServiceImpl() {
 		super();
-	}
+	}*/
 
 	public File singleSave(MultipartFile multiPartFile,String filetype) {
 		// System.out.println("File Description:"+desc);
 		String fileName = null;
 		if (!multiPartFile.isEmpty()) {
 			try {
+				
 
-				String filename = GeneralUtil.generateUUid()+"."+filetype;
+			String filename = "/tmp/"+GeneralUtil.generateUUid()+"."+filetype;
+				//String filename = GeneralUtil.generateUUid()+"."+filetype;
 				byte[] bytes = multiPartFile.getBytes();
 				File file = new File(filename);
+				if(!file.exists())
+				{
+					file.createNewFile();
+				}
 				BufferedOutputStream buffStream = new BufferedOutputStream(new FileOutputStream(file));
 				buffStream.write(bytes);
 				buffStream.close();
 
 				return file;
 			} catch (Exception e) {
+				System.out.println("Hello");
 			}
 
 		} /*
@@ -104,7 +115,7 @@ public class AgentPicServiceImpl implements AgentPicService {
 
 	public String uploadToAws(File file) throws Exception {
 		
-		AWSCredentials credentials = new BasicAWSCredentials("AKIAICRRVE7TOCYTC4TA", "RjMDQiAu7QvnAs3m3R3z1qRReUbXKKyHXihvKOvR");
+		AWSCredentials credentials = new BasicAWSCredentials("AKIAIUNT2LQ62B4HH4EA", "QZXn2rh+JaJoItkHiRRHB9SvYoK/t/GM4N+nmi0V");
         AmazonS3 s3client = new AmazonS3Client(credentials);
         AccessControlList acl = new AccessControlList();
         acl.grantPermission(GroupGrantee.AllUsers, Permission.Read);
@@ -125,21 +136,23 @@ public class AgentPicServiceImpl implements AgentPicService {
 
 
 	
-	@Override
-	public void saveOrUpdate(String emailid,MultipartFile file,String filetype)  {
+	
+	public void saveOrUpdate(String agentemailid,MultipartFile file,String filetype)  {
 		// TODO Auto-generated method stub
 		//String emailid=null;
+		
 		AgentPic agepic=new AgentPic();
 		//MultipartFile file=null;
-		agepic.setEmailId(emailid);
+		agepic.setEmailId(agentemailid);
 		
 		AgentPicServiceImpl ageimpl=new AgentPicServiceImpl();
 		File file1=ageimpl.singleSave(file,filetype);
 		try
 		{
 		String url=ageimpl.uploadToAws(file1);
+		
 		agepic.setUrl(url);
-		age.saveOrUpdate(agepic);
+		agentrepo.insert(agepic);
 		}
 		catch(Exception e){
 			
@@ -153,10 +166,27 @@ public class AgentPicServiceImpl implements AgentPicService {
 	 * @Override public void DeleteAgentPic(String url) { // TODO Auto-generated
 	 * method stub age.DeleteAgentPic(url); }
 	 */
-	@Override
-	public List<AgentPic> list(String agentid) {
+	
+	public List<String> list(String agentid) {
 		// TODO Auto-generated method stub
-		return age.list(agentid);
+		List<String> urlList=new ArrayList<String>();
+		urlList=getPicUrlList(agentid);
+		return urlList;
+	}
+	
+	public List<String> getPicUrlList(String agentid)
+	{
+		List<String> urlList=new ArrayList<String>();
+		List<AgentPic> listPic=agentrepo.findByemailId(agentid);
+		
+		Iterator<AgentPic> iterator=listPic.iterator();
+		while(iterator.hasNext())
+		{
+			String url=iterator.next().getUrl().toString();
+			urlList.add(url);
+		}
+		
+		return urlList;
 	}
 
 }

@@ -1,4 +1,4 @@
-package com.zaso.agent.controller;
+/*package com.zaso.agent.controller;
 
 import java.util.List;
 
@@ -38,3 +38,4 @@ public class ShopsController {
 		shop.DeleteShop(emailid);
 	}
 }
+*/

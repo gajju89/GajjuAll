@@ -1,10 +1,12 @@
 package com.zaso.agent.model;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Repository
+
+@Document(collection="documentInserted")
 public class DocumentAvailable {
-	
+	@Id
 	private String docNumber;
 	private String docName;
 	

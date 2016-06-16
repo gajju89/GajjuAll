@@ -1,8 +1,10 @@
 package com.zaso.agent.model;
 
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@Document(collection="shops")
 public class Shops {
 
 private String objectid;

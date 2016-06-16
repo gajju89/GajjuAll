@@ -29,5 +29,23 @@
 		<servlet-name>appServlet</servlet-name>
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
+	<!-- <filter>
+    <filter-name>EncryptingFilter</filter-name>
+    <filter-class>
+        com.zaso.agent.interceptor.ResonseEncryptionWithFilter
+    </filter-class>
+</filter>
+<filter-mapping>
+  <filter-name>EncryptingFilter</filter-name>
+  <url-pattern>/*</url-pattern>
+</filter-mapping> -->
+	<filter>
+  <filter-name>CorsFilter</filter-name>
+  <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+</filter>
+<filter-mapping>
+  <filter-name>CorsFilter</filter-name>
+  <url-pattern>/*</url-pattern>
+</filter-mapping>
 
 </web-app>

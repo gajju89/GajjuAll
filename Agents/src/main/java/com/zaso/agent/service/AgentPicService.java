@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.zaso.agent.model.AgentPic;
+import com.zaso.agent.model.PicUrl;
 
 public interface AgentPicService {
 	
@@ -14,7 +15,7 @@ public interface AgentPicService {
 	    
 	    /*public void DeleteAgentPic(String url);*/
 	     
-	    public List<AgentPic> list(String agentid);
+	    public List<PicUrl> list(String agentid);
 
 
 }

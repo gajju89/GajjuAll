@@ -21,8 +21,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.zaso.agent.model.AgentSpecialities;
 import com.zaso.agent.model.Agents;
+import com.zaso.agent.model.MongoAgent;
 import com.zaso.agent.service.AgentServiceImpl;
+
+import retrofit.http.Path;
 
 /**
  * Handles requests for the application home page.
@@ -53,8 +57,8 @@ public class AgentController {
 		return "home";
 	}
 	
-	@RequestMapping(value="/getAll", method=RequestMethod.GET)
-	public @ResponseBody List<Agents> getAll()
+	@RequestMapping(value="/getAll/", method=RequestMethod.GET)
+	public @ResponseBody List<MongoAgent> getAll()
 	{
 		return ages.list();
 	}
@@ -79,9 +83,32 @@ public class AgentController {
 		 
 		 
 	}
+	
+	
+	@RequestMapping(value="/save/speciality", method=RequestMethod.POST,headers="Accept=application/json")
+	public @ResponseBody void saveSpeciality(@RequestBody AgentSpecialities agent)
+	{  
+		 ages.saveSpeciality(agent);
+		 
+		 
+	}
+	
+	@RequestMapping(value="/getAll/specialities", method=RequestMethod.GET)
+	public @ResponseBody List<AgentSpecialities> getAllSpeciality()
+	{
+		return ages.getAllSpeciality();
+	}
+	
+	
 	@RequestMapping(value="/delete/{emailid}", method=RequestMethod.GET)
 	public @ResponseBody void DeleteAgent(@PathVariable String emailid)
 	{
 		ages.DeleteAgent(emailid);
+	}
+	
+	@RequestMapping(value="/getAgent/byEmail/{email}/", method=RequestMethod.GET)
+	public @ResponseBody MongoAgent findByEmail(@PathVariable("email")String email)
+	{
+		return ages.findByEmail(email);
 	}
 }

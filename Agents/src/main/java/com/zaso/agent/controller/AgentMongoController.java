@@ -3,11 +3,26 @@ package com.zaso.agent.controller;
 
 	
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
+
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +40,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-
+import com.zaso.agent.model.AgentWithLowerPrice;
+import com.zaso.agent.model.AgentWithSpeciality;
+import com.zaso.agent.model.Category;
+import com.zaso.agent.model.LocalityWithin;
 import com.zaso.agent.model.MongoAgent;
 //import com.zaso.mongo.repositories.AgentRepository;
 import com.zaso.agent.repositories.AgentRepository;
+import com.zaso.agent.service.MongoAgentSpecialityService;
 
 /**
  * Handles requests for the application home page.
@@ -37,7 +56,11 @@ import com.zaso.agent.repositories.AgentRepository;
 @RequestMapping(value="/mongo")
 public class AgentMongoController {
 	@Autowired
+	MongoAgentSpecialityService spec;
+	
+	@Autowired
 	AgentRepository agentrepo;
+	
 
 	private static final Logger logger = LoggerFactory.getLogger(AgentMongoController.class);
 
@@ -68,11 +91,55 @@ public class AgentMongoController {
 	
 		
 		
-		@RequestMapping(value="/All",method=RequestMethod.GET)
-		public @ResponseBody List<MongoAgent> getAll()
+		@RequestMapping(value="/All/{lon}/{lat}/{maxdistance}",method=RequestMethod.GET)
+		public @ResponseBody byte[] getAll(@PathVariable("lon") Double lon,
+		        @PathVariable("lat") Double lat,
+		        @PathVariable("maxdistance") Double maxdist)
 		{
 			//return mongoOperations.findAll(MongoAgent.class);
-			return agentrepo.findAll();
+			List<AgentWithSpeciality> listAgent=spec.getAll(lon, lat, maxdist);
+			
+			try {
+				ObjectMapper mapper=new ObjectMapper();
+				String serialised=mapper.writeValueAsString(listAgent);
+				
+				 Cipher c = Cipher.getInstance("AES");
+				   byte[] key = "43381A8E10469C42EFBD6EA0DFD9CA71".getBytes("UTF-8");
+				   MessageDigest sha = MessageDigest.getInstance("SHA-1");
+				   key = sha.digest(key);
+				   key = Arrays.copyOf(key, 16);
+					SecretKeySpec k =
+					  new SecretKeySpec(key, "AES");
+					c.init(Cipher.ENCRYPT_MODE, k);
+					 return c.doFinal(serialised.toString().getBytes("UTF-8"));
+					//serialised.reset();
+					
+			} catch (JsonGenerationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (JsonMappingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvalidKeyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchPaddingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalBlockSizeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (BadPaddingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return null;
 		}
 
 		/*@RequestMapping(value="/insert",method=RequestMethod.POST, headers="Accept=application/json")
@@ -83,15 +150,165 @@ public class AgentMongoController {
 		}*/
 		
 		@RequestMapping(value="/getbylocation/{lon}/{lat}/{maxdistance}",method=RequestMethod.GET)
-		public @ResponseBody List<MongoAgent> getByLocation(@PathVariable("lon") Double lon,
+		public @ResponseBody byte[] getByLocation(@PathVariable("lon") Double lon,
         @PathVariable("lat") Double lat,
         @PathVariable("maxdistance") Double maxdist)
 		{
-			Point location = new Point(lon,lat);
-			//location.setLocation(lon,lat);
-			Distance distance = new Distance(maxdist, Metrics.KILOMETERS);
-			return agentrepo.findByLocationNear(location, distance);
+			//return spec.getByLocation(lon, lat, maxdist);
+			
+			
+				HashMap<String,HashMap<String ,AgentWithLowerPrice>> map=spec.getByLocation(lon, lat, maxdist);
+				try {
+					ObjectMapper mapper=new ObjectMapper();
+					String serialised=mapper.writeValueAsString(map);
+					
+					 Cipher c = Cipher.getInstance("AES");
+					   byte[] key = "43381A8E10469C42EFBD6EA0DFD9CA71".getBytes("UTF-8");
+					   MessageDigest sha = MessageDigest.getInstance("SHA-1");
+					   key = sha.digest(key);
+					   key = Arrays.copyOf(key, 16);
+						SecretKeySpec k =
+						  new SecretKeySpec(key, "AES");
+						c.init(Cipher.ENCRYPT_MODE, k);
+						 return c.doFinal(serialised.toString().getBytes("UTF-8"));
+						//serialised.reset();
+						
+				} catch (JsonGenerationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (JsonMappingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InvalidKeyException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (NoSuchAlgorithmException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (NoSuchPaddingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalBlockSizeException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (BadPaddingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return null;
+				
+			}
+			
+		
+		
+		@RequestMapping(value="/getByPolygon/{localityId}",method=RequestMethod.GET)
+		public @ResponseBody byte[] getByPolygon(@PathVariable("localityId") String id)
+		{
+			//return spec.getByNearPolygon(id);
+			List<AgentWithSpeciality> list=spec.getByNearPolygon(id);
+			try {
+				ObjectMapper mapper=new ObjectMapper();
+				String serialised=mapper.writeValueAsString(list);
+				
+				 Cipher c = Cipher.getInstance("AES");
+				   byte[] key = "43381A8E10469C42EFBD6EA0DFD9CA71".getBytes("UTF-8");
+				   MessageDigest sha = MessageDigest.getInstance("SHA-1");
+				   key = sha.digest(key);
+				   key = Arrays.copyOf(key, 16);
+					SecretKeySpec k =
+					  new SecretKeySpec(key, "AES");
+					c.init(Cipher.ENCRYPT_MODE, k);
+					 return c.doFinal(serialised.toString().getBytes("UTF-8"));
+					//serialised.reset();
+					
+			} catch (JsonGenerationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (JsonMappingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvalidKeyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchPaddingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalBlockSizeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (BadPaddingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return null;
+			
 		}
+		
+		@RequestMapping(value="/getbylocationUpdate/{lon}/{lat}/{maxdistance}",method=RequestMethod.GET)
+		public @ResponseBody byte[] getByLocationUpdate(@PathVariable("lon") Double lon,
+        @PathVariable("lat") Double lat,
+        @PathVariable("maxdistance") Double maxdist)
+		{
+			List<AgentWithSpeciality> list=spec.getByLocationUpdate(lon, lat, maxdist);
+			
+			try {
+				ObjectMapper mapper=new ObjectMapper();
+				String serialised=mapper.writeValueAsString(list);
+				
+				 Cipher c = Cipher.getInstance("AES");
+				   byte[] key = "43381A8E10469C42EFBD6EA0DFD9CA71".getBytes("UTF-8");
+				   MessageDigest sha = MessageDigest.getInstance("SHA-1");
+				   key = sha.digest(key);
+				   key = Arrays.copyOf(key, 16);
+					SecretKeySpec k =
+					  new SecretKeySpec(key, "AES");
+					c.init(Cipher.ENCRYPT_MODE, k);
+					 return c.doFinal(serialised.toString().getBytes("UTF-8"));
+					//serialised.reset();
+					
+			} catch (JsonGenerationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (JsonMappingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvalidKeyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchPaddingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalBlockSizeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (BadPaddingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return null;
+			
+		}
+		
+		
+		/*@RequestMapping(value="/getBySpeciality/{speciality}",method=RequestMethod.GET)
+		public @ResponseBody List<MongoAgent> getBySpeciality(@PathVariable("speciality")String speciality){
+			return agentrepo.findByTheSpeciality(speciality);
+		}*/
 		
 	/*	@RequestMapping(value = "/getbylocation/{lon}/{lat}/{maxdistance}",
 	            method = RequestMethod.GET, produces = "application/json")

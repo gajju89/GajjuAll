@@ -5,29 +5,30 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.zaso.agent.dao.DocumentAvailableDao;
+
 import com.zaso.agent.model.DocumentAvailable;
+import com.zaso.agent.repositories.DocumentAvailRepository;
 
 @Repository
-public class DocumentAvailableServiceImpl implements DocumentAvailableService {
+public class DocumentAvailableServiceImpl  {
 	
 	@Autowired
-	DocumentAvailableDao docDao;
+	DocumentAvailRepository docRepo;
 
-	@Override
+	
 	public void saveDocumnet(DocumentAvailable docAvailable) {
 		// TODO Auto-generated method stub
-		docDao.saveDocument(docAvailable);
+		docRepo.save(docAvailable);
 
 	}
 	public List<DocumentAvailable> findDocument(String docNumber)
 	{
-		return docDao.findDocument(docNumber);
+		return docRepo.findBydocNumber(docNumber);
 	}
 	
 	public List<DocumentAvailable> findDocument()
 	{
-		return docDao.findDocument();
+		return docRepo.findAll();
 	}
 
 }

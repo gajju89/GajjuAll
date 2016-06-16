@@ -22,7 +22,7 @@ import com.zaso.agent.service.DocumentServiceImpl;
 import com.zaso.agent.service.TaskRelatedDocumentServiceImpl;
 
 @Controller
-@RequestMapping("Document")
+@RequestMapping(value="/Document")
 public class DocumentController {
 	
 	@Autowired
